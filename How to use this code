@@ -1,0 +1,260 @@
+# HOW TO USE THIS PARKING MANAGEMENT SYSTEM
+
+## OVERVIEW
+This is an AI-powered parking management system that automatically detects license plates
+and assigns parking slots in real-time. It uses computer vision and machine learning
+to provide a complete parking automation solution.
+
+## SYSTEM REQUIREMENTS
+- Python 3.8 or higher
+- Windows/Mac/Linux with camera access
+- At least 4GB RAM (for AI models)
+- Webcam or USB camera
+- Internet connection (for initial setup)
+
+## INSTALLATION STEPS
+
+### Step 1: Install Python Dependencies
+Open terminal/command prompt and run:
+```
+pip install ultralytics opencv-python easyocr pillow numpy tkinter
+```
+
+### Step 2: Download Required AI Model Files
+You MUST download these model files and place them in the project folder:
+
+**License Plate Detection Model:**
+- File: license-plate-finetune-v1x.pt
+- Download from: https://huggingface.co/morsetechlab/yolov11-license-plate-detection/tree/main
+- Size: ~22MB
+- Place in: same folder as demo_gui.py
+
+**Vehicle Detection Model:**
+- File: best.pt
+- This should be a YOLO model trained on vehicles/VisDrone dataset
+- If you don't have this, you can use any YOLO vehicle detection model
+- Rename it to "best.pt" and place in project folder
+
+### Step 3: Prepare Your Video File
+- Get a parking lot video (MP4 format recommended)
+- Place it in a "videos" folder or update the path in config.json
+- Default expects: ../videos/8min.mp4
+
+## SETUP PROCESS
+
+### Method 1: Quick Start (Recommended)
+1. Ensure all files are in project folder
+2. Update config.json with your video path and camera index
+3. Run: python demo_gui.py
+4. Click "Start" and test with any license plate image
+
+### Method 2: Full Setup with Parking Slot Annotation
+1. Extract a frame from your video: python extract_frame.py
+2. Annotate parking slots: python annotate_parking.py
+3. Use the GUI tool to mark parking spot boundaries
+4. Save as bounding_boxes.json
+5. Run the main system: python demo_gui.py
+
+## FILE STRUCTURE
+Your project folder should look like this:
+```
+parking-system/
+├── demo_gui.py                    # Main application (RUN THIS)
+├── config.json                    # Settings file
+├── LP_w_easyocr_documentation.py  # License plate detection
+├── parking_manager.py             # Parking slot management
+├── generate_assignment_report.py  # Report generator
+├── annotate_parking.py           # Slot annotation tool
+├── extract_frame.py              # Frame extraction utility
+├── license-plate-finetune-v1x.pt # AI model (DOWNLOAD REQUIRED)
+├── best.pt                       # AI model (DOWNLOAD REQUIRED)
+├── bounding_boxes.json           # Parking slots data
+└── videos/
+    └── 8min.mp4                  # Your parking video
+```
+
+## CONFIGURATION
+
+### Edit config.json before running:
+```json
+{
+  "camera_index": 0,                    // Change if you have multiple cameras
+  "video_path": "../videos/8min.mp4",   // Path to your parking video
+  "confidence_threshold": 0.4,          // Lower = more detections
+  "ocr_confidence_threshold": 0.6       // Lower = more license plate reads
+}
+```
+
+### Camera Index Guide:
+- 0 = Default camera (built-in laptop camera)
+- 1 = First USB camera
+- 2 = Second USB camera, etc.
+
+## HOW TO RUN
+
+### Basic Usage:
+```
+python demo_gui.py
+```
+1. Window opens with two panels (left=camera, right=video)
+2. Click "Start" button
+3. Hold up license plate images to camera or use real license plates
+4. Watch automatic slot assignment happen
+5. Click "Stop" when done
+
+### Generate Reports:
+```
+python generate_assignment_report.py
+```
+Creates parking_report.json with all assignments and statistics.
+
+## TESTING THE SYSTEM
+
+### Without Real License Plates:
+1. Find license plate images on Google
+2. Display them on your phone/tablet
+3. Hold them up to the camera
+4. System should detect and assign parking slots
+
+### With Real Setup:
+1. Point camera at parking lot entrance
+2. Use overhead video of the same parking lot
+3. System will detect real vehicles and plates
+
+## TROUBLESHOOTING
+
+### "Model file not found" Error:
+- Make sure license-plate-finetune-v1x.pt is in the project folder
+- Download from the HuggingFace link provided above
+- Check file isn't corrupted (should be ~22MB)
+
+### "Camera not found" Error:
+- Try different camera_index values (0, 1, 2) in config.json
+- Make sure no other apps are using the camera
+- Check camera permissions on Mac/Windows
+
+### "EasyOCR installation failed":
+- Try: pip install easyocr --no-cache-dir
+- On Windows: might need Visual Studio C++ build tools
+- Alternative: use conda install easyocr
+
+### Poor License Plate Detection:
+- Adjust confidence_threshold in config.json (try 0.2-0.6)
+- Ensure good lighting on license plates
+- Make sure plates are clearly visible and not too small
+
+### "No video file" Error:
+- Update video_path in config.json to correct location
+- Use forward slashes (/) in paths, even on Windows
+- Try absolute path like C:/Users/YourName/videos/parking.mp4
+
+### GUI won't open:
+- Install tkinter: pip install tkinter
+- On Linux: sudo apt-get install python3-tk
+- Try running with: python -m tkinter (should open test window)
+
+## OUTPUT FILES
+
+### During Operation:
+- parking_assignments.json: Real-time license plate assignments
+- bounding_boxes.json: Parking slot coordinates
+
+### After Running Reports:
+- parking_report.json: Complete statistics and assignment history
+
+## CUSTOMIZATION OPTIONS
+
+### Change Parking Slot Names:
+Edit the parking_manager.py file, modify the slot naming logic in load_parking_data()
+
+### Adjust Detection Sensitivity:
+In config.json:
+- confidence_threshold: 0.1-0.9 (lower = more detections)
+- ocr_confidence_threshold: 0.1-0.9 (lower = read more plates)
+
+### Use Different Video:
+1. Replace video file
+2. Update video_path in config.json
+3. Re-run annotate_parking.py to mark new parking spots
+
+## ADVANCED USAGE
+
+### Running Headless (No GUI):
+- Modify demo_gui.py to remove tkinter parts
+- Use OpenCV display only
+- Good for server deployment
+
+### Integration with Database:
+- Modify parking_manager.py to save to MySQL/PostgreSQL
+- Replace JSON storage with database calls
+
+### REST API Integration:
+- Add Flask/FastAPI endpoints
+- Expose assignment data via web API
+- Build web dashboard
+
+## PERFORMANCE OPTIMIZATION
+
+### For Slower Computers:
+- Reduce camera resolution in demo_gui.py
+- Process every 5th frame instead of every 3rd
+- Lower confidence thresholds
+- Use smaller AI models
+
+### For Better Accuracy:
+- Use higher resolution cameras
+- Improve lighting conditions
+- Process every frame (higher CPU usage)
+- Fine-tune confidence thresholds
+
+## SUPPORT AND ISSUES
+
+### Common Issues:
+1. Models not loading → Check file paths and downloads
+2. Camera not working → Try different indices, check permissions
+3. Poor OCR results → Adjust lighting, clean license plates
+4. Slow performance → Reduce processing frequency, lower resolution
+
+### Getting Help:
+- Check error messages carefully
+- Verify all dependencies are installed
+- Ensure model files are correctly downloaded
+- Test individual components (camera, models) separately
+
+## DEPLOYMENT NOTES
+
+### For Production Use:
+1. Use dedicated cameras with good positioning
+2. Ensure stable lighting conditions
+3. Regular model updates for better accuracy
+4. Set up proper database storage
+5. Implement backup and recovery procedures
+6. Monitor system performance regularly
+
+### Security Considerations:
+- Secure camera feeds (HTTPS/encrypted streams)
+- Protect license plate data (GDPR compliance)
+- Regular security updates
+- Access control for reports and data
+
+## EXAMPLE WORKFLOW
+
+1. Download and install everything
+2. Test with: python demo_gui.py
+3. Hold phone with license plate image to camera
+4. See "Assigned: ABC123 → A1" message
+5. Run: python generate_assignment_report.py
+6. Check parking_report.json for results
+7. Customize for your specific needs
+
+## SUCCESS INDICATORS
+
+You know it's working when:
+✅ GUI opens without errors
+✅ Both camera feeds display properly
+✅ License plates get green bounding boxes
+✅ "Assigned: PLATE → SLOT" messages appear
+✅ JSON files are created with assignment data
+✅ Reports generate successfully
+
+Happy parking management! 🚗🅿️

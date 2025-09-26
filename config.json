@@ -1,0 +1,10 @@
+{
+  "camera_index": 0,
+  "video_path": "../videos/8min.mp4",
+  "model_path": "license-plate-finetune-v1x.pt",
+  "parking_model_path": "best.pt",
+  "json_path": "bounding_boxes.json",
+  "assignments_json": "parking_assignments.json",
+  "confidence_threshold": 0.4,
+  "ocr_confidence_threshold": 0.6
+}
