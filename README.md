@@ -23,4 +23,5 @@ See `HOW_TO_USE_THIS_CODE.txt` for complete setup and usage instructions.
 - YOLO11 (Ultralytics)
 - EasyOCR
 - OpenCV
+
 - Tkinter GUI
